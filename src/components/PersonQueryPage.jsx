@@ -1,6 +1,6 @@
 // Importing necessary modules and components from external files
 import { useEffect, useState } from "react"; // Importing React hooks for managing state and side effects
-import UserData from "./components/UserData.jsx"; // Importing the UserData component from an external file
+import UserData from "./UserData.jsx"; // Importing the UserData component from an external file
 import axios from 'axios'; // Importing Axios for making HTTP requests
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -8,7 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const notify = () => toast("Wow so easy!");
 
-const App = () => {
+const PersonQueryPage = () => {
     // State variables initialization using the useState hook
     const initialFormData = {
         name: "",
