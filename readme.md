@@ -1,7 +1,3 @@
-Tabii, işte İngilizce bir README dosyası örneği:
-
----
-
 # Person Query Application
 
 This React application allows users to input various personal details (name, surname, TC number, date of birth, parents' names and TC numbers, as well as address information) and submit a query. When the form is submitted, it sends a GET request to a server endpoint with the form data as parameters. The response from the server, an array of user data, is displayed in a table below the form.
