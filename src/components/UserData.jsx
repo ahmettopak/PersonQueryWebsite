@@ -4,7 +4,6 @@ const UserData = ({ users }) => {
             {
                 users.map((curUser) => {
                     const { ADI, SOYADI, TC, BABAADI, ANNEADI, DOGUMTARIHI, NUFUSIL, NUFUSILCE, ANNETC, BABATC } = curUser;
-                    console.log(curUser);
                     return (
                         <tr>
                             <td>{ADI}</td>

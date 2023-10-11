@@ -2,11 +2,8 @@
 import { useEffect, useState } from "react"; // Importing React hooks for managing state and side effects
 import UserData from "./components/UserData.jsx"; // Importing the UserData component from an external file
 import axios from 'axios'; // Importing Axios for making HTTP requests
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import GsmData from "./components/GsmData.jsx";
 // App component definition
-
-const notify = () => toast("Wow so easy!");
 
 const App = () => {
     // State variables initialization using the useState hook
@@ -14,6 +11,7 @@ const App = () => {
         name: "",
         surname: "",
         tc: "",
+        phone: "",
         dob: "",
         mothername: "",
         fathername: "",
@@ -23,20 +21,41 @@ const App = () => {
         provincedetail: "",
     };
     const [users, setUsers] = useState([]); // State variable to store user data fetched from the server
+    const [gsm, setGsm] = useState([]); // State variable to store user data fetched from the server
+
     const [formData, setFormData] = useState(initialFormData);
+    let combinedResponseData = [];
 
     // Function to handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault(); // Prevents the default form submission behavior
         try {
             setUsers([]); // Clears the users state to prepare for new data
+            setGsm([]); // Clears the users state to prepare for new data
+
             // Sends a GET request to the server with form data as parameters
-            const response = await axios.get('http://localhost:3000/person', { params: formData });
-            console.log('Server Response:', response.data); // Logs the server response data to the console
+            var response = await axios.get('http://localhost:3000/person', { params: formData });
+
+            var gsmResponse = await axios.get('http://localhost:3000/gsm', { params: formData });
+
             // If the response contains data, updates the users state with the received data
             if (response.data.length > 0) {
                 setUsers(response.data);
                 notify();
+            }
+
+            if (gsmResponse.data.length > 0) {
+                setGsm(gsmResponse.data);
+
+                for (let i = 0; i < gsmResponse.data.length; i++) {
+                    const tc = gsmResponse.data[i].TC;
+                    const response = await axios.get(`http://localhost:3000/person?tc=${tc}`);
+
+                    console.log(`Response for TC ${tc}:`, combinedResponseData);
+
+                    setUsers(users => [...users, response.data[0]]);
+                }
+
             }
         } catch (error) {
             console.error('Error:', error); // Logs any errors that occur during the API request
@@ -50,6 +69,8 @@ const App = () => {
     };
     const resetForm = () => {
         setUsers([]); // Clears the users state to prepare for new data
+        setGsm([]); // Clears the users state to prepare for new data
+
         setFormData(initialFormData);
         toast.info('🦄 Wow so easy!', {
             position: "top-center",
@@ -63,12 +84,12 @@ const App = () => {
         });
 
     };
-
     // JSX structure representing the form and user data table
     return <>
         {/* Top-level div element with a class name */}
         <div className="App">
             <h1>Kişi Sorgulama</h1> {/* Heading for the form */}
+
             {/* Form element with input fields and event handlers */}
             <form onSubmit={handleSubmit} className="form-container" id="form">
                 {/* Input fields for various user data */}
@@ -90,6 +111,11 @@ const App = () => {
                         {/* Input field for user's TC (Türkiye Cumhuriyeti) number */}
                         <label>TC:</label>
                         <input type="text" name="tc" value={formData.tc} onChange={handleInputChange} />
+                    </div></li>
+                    <li class="flex-item"> <div className="form-row">
+                        {/* Input field for user's phone number */}
+                        <label>Telefon:</label>
+                        <input type="text" name="phone" value={formData.phone} onChange={handleInputChange} />
                     </div></li>
                     <li class="flex-item"> <div className="form-row">
 
@@ -132,11 +158,25 @@ const App = () => {
                         <input type="text" name="provincedetail" value={formData.provincedetail} onChange={handleInputChange} />
 
                     </div></li>
+
                 </ul>
                 {/* Submit button to trigger the form submission */}
                 <button type="submit">Sorgula</button>
                 <button type="button" onClick={resetForm}>Temizle</button>
+                < table >
+                    <thead>
+                        {/* Table header row with column names */}
+                        <tr>
+                            <th>TC</th>
+                            <th>TELEFON</th>
 
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {/* Rendering the UserData component and passing the users data as a prop */}
+                        <GsmData user={gsm} />
+                    </tbody>
+                </table >
             </form >
             <div class="table-container">
 
@@ -162,6 +202,7 @@ const App = () => {
                         <UserData users={users} />
                     </tbody>
                 </table >
+
             </div>
         </div > {/* Closing div for the main container */}
     </>
