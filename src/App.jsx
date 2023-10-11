@@ -3,6 +3,9 @@ import { useEffect, useState } from "react"; // Importing React hooks for managi
 import UserData from "./components/UserData.jsx"; // Importing the UserData component from an external file
 import axios from 'axios'; // Importing Axios for making HTTP requests
 import GsmData from "./components/GsmData.jsx";
+import Alert from 'react-bootstrap/Alert';
+import DangerAlert from "./components/DangerAlert.jsx";
+
 // App component definition
 
 const App = () => {
@@ -24,8 +27,22 @@ const App = () => {
     const [gsm, setGsm] = useState([]); // State variable to store user data fetched from the server
 
     const [formData, setFormData] = useState(initialFormData);
-    let combinedResponseData = [];
 
+
+    const [showMessage, setShowMessage] = useState(false);
+    const [message, setMessage] = useState("Mesaj");
+
+
+    function ShowAlertMessage(text) {
+        setMessage(text);
+        const timer = setTimeout(() => {
+            setShowMessage(false);
+        }, 3000); // 3 saniye sonra alert kapanacak
+        setShowMessage(true);
+
+        // useEffect'in temizleme fonksiyonu ile bileşen yeniden render edilirken bu timer'ı temizle
+        return () => clearTimeout(timer);
+    }
     // Function to handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault(); // Prevents the default form submission behavior
@@ -41,7 +58,6 @@ const App = () => {
             // If the response contains data, updates the users state with the received data
             if (response.data.length > 0) {
                 setUsers(response.data);
-                notify();
             }
 
             if (gsmResponse.data.length > 0) {
@@ -50,15 +66,14 @@ const App = () => {
                 for (let i = 0; i < gsmResponse.data.length; i++) {
                     const tc = gsmResponse.data[i].TC;
                     const response = await axios.get(`http://localhost:3000/person?tc=${tc}`);
-
                     console.log(`Response for TC ${tc}:`, combinedResponseData);
-
                     setUsers(users => [...users, response.data[0]]);
                 }
 
             }
         } catch (error) {
-            console.error('Error:', error); // Logs any errors that occur during the API request
+            console.error('Error:', error);
+            // Logs any errors that occur during the API request
         }
     };
 
@@ -66,30 +81,23 @@ const App = () => {
     const handleInputChange = (e) => {
         const { name, value } = e.target; // Destructures the name and value properties from the input element
         setFormData({ ...formData, [name]: value }); // Updates the form data state with the new input value
+
     };
     const resetForm = () => {
         setUsers([]); // Clears the users state to prepare for new data
         setGsm([]); // Clears the users state to prepare for new data
 
         setFormData(initialFormData);
-        toast.info('🦄 Wow so easy!', {
-            position: "top-center",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "colored",
-        });
+        ShowAlertMessage("asdadasasdada");
 
     };
     // JSX structure representing the form and user data table
     return <>
         {/* Top-level div element with a class name */}
         <div className="App">
-            <h1>Kişi Sorgulama</h1> {/* Heading for the form */}
 
+            <h1>Kişi Sorgulama</h1> {/* Heading for the form */}
+            {<DangerAlert show={showMessage} text={message} />}
             {/* Form element with input fields and event handlers */}
             <form onSubmit={handleSubmit} className="form-container" id="form">
                 {/* Input fields for various user data */}
@@ -158,7 +166,6 @@ const App = () => {
                         <input type="text" name="provincedetail" value={formData.provincedetail} onChange={handleInputChange} />
 
                     </div></li>
-
                 </ul>
                 {/* Submit button to trigger the form submission */}
                 <button type="submit">Sorgula</button>
