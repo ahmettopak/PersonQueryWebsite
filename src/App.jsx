@@ -4,7 +4,7 @@ import UserData from "./components/UserData.jsx"; // Importing the UserData comp
 import axios from 'axios'; // Importing Axios for making HTTP requests
 import GsmData from "./components/GsmData.jsx";
 import Alert from 'react-bootstrap/Alert';
-import DangerAlert from "./components/DangerAlert.jsx";
+import alertify from "alertifyjs";
 
 // App component definition
 
@@ -28,20 +28,10 @@ const App = () => {
 
     const [formData, setFormData] = useState(initialFormData);
 
-
-    const [showMessage, setShowMessage] = useState(false);
-    const [message, setMessage] = useState("Mesaj");
-
-
     function ShowAlertMessage(text) {
-        setMessage(text);
-        const timer = setTimeout(() => {
-            setShowMessage(false);
-        }, 3000); // 3 saniye sonra alert kapanacak
-        setShowMessage(true);
 
-        // useEffect'in temizleme fonksiyonu ile bileşen yeniden render edilirken bu timer'ı temizle
-        return () => clearTimeout(timer);
+        alertify
+            .success(text);
     }
     // Function to handle form submission
     const handleSubmit = async (e) => {
@@ -88,7 +78,7 @@ const App = () => {
         setGsm([]); // Clears the users state to prepare for new data
 
         setFormData(initialFormData);
-        ShowAlertMessage("asdadasasdada");
+        ShowAlertMessage("Temizlendi");
 
     };
     // JSX structure representing the form and user data table
@@ -97,7 +87,6 @@ const App = () => {
         <div className="App">
 
             <h1>Kişi Sorgulama</h1> {/* Heading for the form */}
-            {<DangerAlert show={showMessage} text={message} />}
             {/* Form element with input fields and event handlers */}
             <form onSubmit={handleSubmit} className="form-container" id="form">
                 {/* Input fields for various user data */}
